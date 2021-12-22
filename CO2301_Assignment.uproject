@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "4.26",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "CO2301_Assignment",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
