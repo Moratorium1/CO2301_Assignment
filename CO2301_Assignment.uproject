@@ -7,7 +7,10 @@
 		{
 			"Name": "CO2301_Assignment",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	]
 }
