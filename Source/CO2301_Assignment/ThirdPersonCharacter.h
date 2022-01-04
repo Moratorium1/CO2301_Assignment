@@ -23,6 +23,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool Ironsight;
 
+	// Player Controls
 	void MoveForwards(float AxisAmount);
 	void Strafe(float AxisAmount);
 	void Lookup(float AxisAmount);
@@ -34,13 +35,27 @@ public:
 	void EndIronSight();
 	void FireWeapon();
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	class UCameraComponent* Camera;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AThirdPersonGun> WeaponClass;
+
 	UPROPERTY()
 	AThirdPersonGun* ActiveWeapon;
+
+	UPROPERTY(VisibleAnywhere)
+	float Health = 100.0f;
 
 };

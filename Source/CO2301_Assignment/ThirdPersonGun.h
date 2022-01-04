@@ -15,14 +15,27 @@ public:
 	// Sets default values for this actor's properties
 	AThirdPersonGun();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void Fire();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+private:
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(EditAnywhere)
+	float Range = 1000;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 10.0f;
+	
 };
