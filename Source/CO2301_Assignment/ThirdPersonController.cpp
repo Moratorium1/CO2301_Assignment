@@ -17,7 +17,10 @@ void AThirdPersonController::SetupInputComponent()
 	InputComponent->BindAction("Crouch",	IE_Released,	this, &AThirdPersonController::CallEndCrouch);
 	InputComponent->BindAction("Ironsight", IE_Pressed,		this, &AThirdPersonController::CallStartIronSight);
 	InputComponent->BindAction("Ironsight", IE_Released,	this, &AThirdPersonController::CallEndIronSight);
-	InputComponent->BindAction("Fire",		IE_Released,	this, &AThirdPersonController::CallFireWeapon);
+	InputComponent->BindAction("Fire",		IE_Pressed,		this, &AThirdPersonController::CallFireWeapon);
+
+	InputComponent->BindAction("SwitchUp",	IE_Pressed,		this, &AThirdPersonController::CallSwitchWeaponUp);
+	InputComponent->BindAction("SwitchDown", IE_Pressed,	this, &AThirdPersonController::CallSwitchWeaponDown);
 }
 
 void AThirdPersonController::BeginPlay()
@@ -105,5 +108,21 @@ void AThirdPersonController::CallFireWeapon()
 	if (MyPawn->IsA(AThirdPersonCharacter::StaticClass()))
 	{
 		Cast<AThirdPersonCharacter>(MyPawn)->FireWeapon();
+	}
+}
+
+void AThirdPersonController::CallSwitchWeaponUp()
+{
+	if (MyPawn->IsA(AThirdPersonCharacter::StaticClass()))
+	{
+		Cast<AThirdPersonCharacter>(MyPawn)->SwitchWeaponUp();
+	}
+}
+
+void AThirdPersonController::CallSwitchWeaponDown()
+{
+	if (MyPawn->IsA(AThirdPersonCharacter::StaticClass()))
+	{
+		Cast<AThirdPersonCharacter>(MyPawn)->SwitchWeaponDown();
 	}
 }

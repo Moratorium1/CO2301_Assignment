@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "ThirdPersonGun.generated.h"
 
 UCLASS()
@@ -19,6 +20,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Fire();
+	void SwitchModeUp();
+	void SwitchModeDown();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,16 +29,39 @@ protected:
 
 private:
 
+	void SingleFire();
+	void SingleReload();
+	void BurstFire();
+	void RapidFire();
+
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
 
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* Mesh;
 
+	UPROPERTY()
+	int Mode = 1;
+
+	
+
+	UPROPERTY()
+	bool bFiring;
+
+	//SingleFireStats
+	UPROPERTY(EditAnywhere)
+	int SingleAmmoMax = 10;
+
+	UPROPERTY(EditAnywhere)
+	int SingleAmmo;
+
 	UPROPERTY(EditAnywhere)
 	float Range = 1000;
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Recoil = 30.0f;
 	
 };

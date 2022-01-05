@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "ThirdPersonCharacter.generated.h"
 
 class AThirdPersonGun;
@@ -23,6 +24,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool Ironsight;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
+	bool bReloading;
+
 	// Player Controls
 	void MoveForwards(float AxisAmount);
 	void Strafe(float AxisAmount);
@@ -34,6 +38,8 @@ public:
 	void StartIronSight();
 	void EndIronSight();
 	void FireWeapon();
+	void SwitchWeaponUp();
+	void SwitchWeaponDown();
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

@@ -99,6 +99,16 @@ void AThirdPersonCharacter::FireWeapon()
 	ActiveWeapon->Fire();
 }
 
+void AThirdPersonCharacter::SwitchWeaponUp()
+{
+	ActiveWeapon->SwitchModeUp();
+}
+
+void AThirdPersonCharacter::SwitchWeaponDown()
+{
+	ActiveWeapon->SwitchModeDown();
+}
+
 float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
