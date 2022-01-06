@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectileGrenade.h"
 #include "ThirdPersonGun.generated.h"
 
 UCLASS()
@@ -29,9 +30,9 @@ protected:
 
 private:
 
+	void FireGrenade();
 	void SingleFire();
 	void SingleReload();
-	void BurstFire();
 	void RapidFire();
 
 	UPROPERTY(VisibleAnywhere)
@@ -40,10 +41,14 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* Mesh;
 
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* ProjectileSpawn;
+
+	UPROPERTY(VisibleAnywhere)
+		AProjectileGrenade* FiredGrenade;
+
 	UPROPERTY()
 	int Mode = 1;
-
-	
 
 	UPROPERTY()
 	bool bFiring;
@@ -63,5 +68,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Recoil = 30.0f;
-	
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AProjectileGrenade> ProjectileClass;
 };

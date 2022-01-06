@@ -27,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool bReloading;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
+	bool bIsDead = false;
+
 	// Player Controls
 	void MoveForwards(float AxisAmount);
 	void Strafe(float AxisAmount);
@@ -63,5 +66,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float Health = 100.0f;
+
+	
 
 };

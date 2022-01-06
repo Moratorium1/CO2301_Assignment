@@ -4,6 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ThirdPersonGun.h"
+#include "ThirdPersonController.h"
 #include "ThirdPersonCharacter.h"
 
 
@@ -50,12 +51,21 @@ void AThirdPersonCharacter::Tick(float DeltaTime)
 
 void AThirdPersonCharacter::MoveForwards(float AxisAmount)
 {
-	AddMovementInput(GetActorForwardVector() * AxisAmount);
+	// Turn the player to match the controller rotation 
+	// Required since the blueprint is set to not inherit controller yaw
+	//This allows ther player to stand stationary and aim left and right without turning the whole character 
+	AController* CharController = GetController();
+	FRotator ControllerRotation = CharController->GetControlRotation();
+	FRotator CharRotation = GetActorRotation();
+	FRotator NewRotation = FRotator(CharRotation.Pitch, ControllerRotation.Yaw, CharRotation.Roll);
+
+	SetActorRotation(NewRotation);
+	AddMovementInput(GetActorForwardVector(), AxisAmount);
 }
 
 void AThirdPersonCharacter::Strafe(float AxisAmount)
 {
-	AddMovementInput(GetActorRightVector() * AxisAmount);
+	AddMovementInput(GetActorRightVector(), AxisAmount);
 }
 
 void AThirdPersonCharacter::Lookup(float AxisAmount)
@@ -115,6 +125,8 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	DamageApplied = FMath::Min(Health, DamageApplied);
 
 	Health -= DamageApplied;
+	
+	if (Health <= 0) bIsDead = true;
 	UE_LOG(LogTemp, Warning, TEXT("Health left %f"), Health);
 
 	return DamageApplied;

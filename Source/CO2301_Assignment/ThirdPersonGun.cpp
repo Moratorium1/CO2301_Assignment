@@ -17,6 +17,9 @@ AThirdPersonGun::AThirdPersonGun()
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Root);
 
+	ProjectileSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawn"));
+	ProjectileSpawn->SetupAttachment(Mesh);
+
 }
 
 // Called when the game starts or when spawned
@@ -26,48 +29,6 @@ void AThirdPersonGun::BeginPlay()
 
 	SingleAmmo = SingleAmmoMax;
 
-}
-
-void AThirdPersonGun::BurstFire()
-{
-	//Initialise Viewport Variables
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	AController* OwnerController = OwnerPawn->GetController();
-	FVector		ViewLocation;
-	FRotator	ViewRotation;
-
-	//Initialise LineTrace Variables
-	FHitResult HitResult;
-	FVector LineTraceEnd;
-	bool bObjectHit;
-
-	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
-	//Work out end of line trace
-	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;
-	//Perform line trace store hit object in HitResult
-
-
-
-	for (int i = 0; i < 3; i++)
-	{
-		ViewLocation.X += FMath::FRandRange(-Recoil / 2, Recoil / 2);
-		ViewLocation.Y += FMath::FRandRange(-Recoil / 2, Recoil / 2);
-		ViewLocation.Z += Recoil;
-		bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2);
-
-		//If an object was hit 
-		if (bObjectHit)
-		{
-			//Get the actor from the hit result so that a take damage function can be called
-			AActor* ActorHit = HitResult.GetActor();
-
-			if (ActorHit != nullptr)
-			{
-				DrawDebugPoint(GetWorld(), HitResult.Location, 10, FColor::Red, true);
-				UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
-			}
-		}
-	}
 }
 
 void AThirdPersonGun::SingleFire()
@@ -150,21 +111,33 @@ void AThirdPersonGun::RapidFire()
 	}
 }
 
+void AThirdPersonGun::FireGrenade()
+{
+	FVector SpawnLocation	= ProjectileSpawn->GetComponentLocation();
+	FRotator SpawnRotation	= ProjectileSpawn->GetComponentRotation();
+
+	FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
+}
+
 // Called every frame
 void AThirdPersonGun::SwitchModeUp()
 {
 	Mode++;
+
+	//Mode Wrap around
+	if (Mode > 2) Mode = 0;
 }
 
 void AThirdPersonGun::SwitchModeDown()
 {
 	Mode--;
+	//Mode Wrap around
+	if (Mode < 0) Mode = 2;
 }
 
 void AThirdPersonGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AThirdPersonGun::Fire()
@@ -176,6 +149,11 @@ void AThirdPersonGun::Fire()
 
 	switch (Mode)
 	{
+		case 0:
+			FireGrenade();
+			UE_LOG(LogTemp, Warning, TEXT("GrenadeLauncher"))
+		break;
+
 		case 1:
 			if (SingleAmmo > 0)
 				SingleFire();
@@ -184,11 +162,7 @@ void AThirdPersonGun::Fire()
 		break;
 
 		case 2:
-			BurstFire();
-		break;
-
-		case 3:
-			RapidFire();
+			UE_LOG(LogTemp, Warning, TEXT("RapidFire"))
 		break;
 
 
