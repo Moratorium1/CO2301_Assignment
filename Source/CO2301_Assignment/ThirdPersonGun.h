@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
+#include "ProjectileGrenade.h"
 #include "ThirdPersonGun.generated.h"
 
 UCLASS()
@@ -15,14 +17,58 @@ public:
 	// Sets default values for this actor's properties
 	AThirdPersonGun();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void Fire();
+	void SwitchModeUp();
+	void SwitchModeDown();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+private:
+
+	void FireGrenade();
+	void SingleFire();
+	void SingleReload();
+	void RapidFire();
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* ProjectileSpawn;
+
+	UPROPERTY(VisibleAnywhere)
+	AProjectileGrenade* FiredGrenade;
+
+	UPROPERTY()
+	int Mode = 1;
+
+	UPROPERTY()
+	bool bFiring;
+
+	//SingleFireStats
+	UPROPERTY(EditAnywhere)
+	int SingleAmmoMax = 10;
+
+	UPROPERTY(EditAnywhere)
+	int SingleAmmo;
+
+	UPROPERTY(EditAnywhere)
+	float Range = 1000;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Recoil = 30.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AProjectileGrenade> ProjectileClass;
 };
