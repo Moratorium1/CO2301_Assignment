@@ -117,6 +117,7 @@ void AThirdPersonGun::FireGrenade()
 	FRotator SpawnRotation	= ProjectileSpawn->GetComponentRotation();
 
 	FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
+	FiredGrenade->SetOwner(GetOwner());
 }
 
 // Called every frame

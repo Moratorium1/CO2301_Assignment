@@ -45,7 +45,7 @@ private:
 	USceneComponent* ProjectileSpawn;
 
 	UPROPERTY(VisibleAnywhere)
-		AProjectileGrenade* FiredGrenade;
+	AProjectileGrenade* FiredGrenade;
 
 	UPROPERTY()
 	int Mode = 1;
