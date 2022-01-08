@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ThirdPersonCharacter.h"
 #include "ThirdPersonController.h"
+#include "ThirdPersonCharacter.h"
+
 
 void AThirdPersonController::SetupInputComponent()
 {
@@ -28,6 +29,12 @@ void AThirdPersonController::BeginPlay()
 	Super::BeginPlay();
 
 	MyPawn = GetPawn();
+
+	HUD = CreateWidget(this, HUDClass);
+	if (HUD != nullptr)
+	{
+		HUD->AddToViewport();
+	}
 }
 
 

@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "ThirdPersonGun.h"
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
 #include "ThirdPersonCharacter.h"
-#include "ThirdPersonGun.h"
 
 // Sets default values
 AThirdPersonGun::AThirdPersonGun()
@@ -152,14 +152,14 @@ void AThirdPersonGun::Fire()
 	{
 		case 0:
 			FireGrenade();
-			UE_LOG(LogTemp, Warning, TEXT("GrenadeLauncher"))
 		break;
 
 		case 1:
-			if (SingleAmmo > 0)
+			//if (SingleAmmo > 0)
 				SingleFire();
-			else
-				SingleReload();
+			
+			//else
+			//	SingleReload();
 		break;
 
 		case 2:

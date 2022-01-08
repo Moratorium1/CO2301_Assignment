@@ -1,11 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "ThirdPersonCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ThirdPersonGun.h"
 #include "ThirdPersonController.h"
-#include "ThirdPersonCharacter.h"
+
 
 
 // Sets default values
