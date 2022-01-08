@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 #include "ThirdPersonController.generated.h"
 
 /**
@@ -19,6 +20,11 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> HUDClass;
+
+	UUserWidget* HUD;
 
 	virtual void SetupInputComponent() override;
 

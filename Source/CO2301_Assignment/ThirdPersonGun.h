@@ -71,4 +71,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AProjectileGrenade> ProjectileClass;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* MuzzleFlash;
 };
