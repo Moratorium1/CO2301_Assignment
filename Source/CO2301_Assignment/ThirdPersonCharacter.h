@@ -67,6 +67,4 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	float Health = 100.0f;
 
-	
-
 };

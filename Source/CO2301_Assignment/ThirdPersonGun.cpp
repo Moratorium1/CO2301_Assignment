@@ -2,6 +2,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 #include "ThirdPersonCharacter.h"
 #include "ThirdPersonGun.h"
 
@@ -67,11 +68,22 @@ void AThirdPersonGun::SingleFire()
 	SingleAmmo--;
 }
 
-void AThirdPersonGun::SingleReload()
+void AThirdPersonGun::SingleReloadStart()
 {
 	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
 	OwnerChar->bReloading = true;
+	bReloading = true;
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AThirdPersonGun::SingleReloadEnd, MaxReloadTime, false);
 	UE_LOG(LogTemp, Warning, TEXT("Single Reload"));
+}
+
+void AThirdPersonGun::SingleReloadEnd()
+{
+	SingleAmmo = SingleAmmoMax;
+	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
+	OwnerChar->bReloading = false;
+	bReloading = false;
+	UE_LOG(LogTemp, Warning, TEXT("Single Reload End"));
 }
 
 void AThirdPersonGun::RapidFire()
@@ -115,9 +127,15 @@ void AThirdPersonGun::FireGrenade()
 {
 	FVector SpawnLocation	= ProjectileSpawn->GetComponentLocation();
 	FRotator SpawnRotation	= ProjectileSpawn->GetComponentRotation();
+	TArray<AActor*> GrenadeCount;
 
-	FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
-	FiredGrenade->SetOwner(GetOwner());
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProjectileGrenade::StaticClass(), GrenadeCount);
+
+	if (GrenadeCount.Num() < 1)
+	{
+		FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
+		FiredGrenade->SetOwner(GetOwner());
+	}
 }
 
 // Called every frame
@@ -147,26 +165,28 @@ void AThirdPersonGun::Fire()
 		Line trace from player viewport to a location determined by the weapons maximum range
 		if an object is hit store it in a FHitResult and apply damage
 	*/
-
-	switch (Mode)
+	if (!bReloading)
 	{
+		switch (Mode)
+		{
 		case 0:
 			FireGrenade();
 			UE_LOG(LogTemp, Warning, TEXT("GrenadeLauncher"))
-		break;
+				break;
 
 		case 1:
 			if (SingleAmmo > 0)
 				SingleFire();
 			else
-				SingleReload();
-		break;
+				SingleReloadStart();
+			break;
 
 		case 2:
 			UE_LOG(LogTemp, Warning, TEXT("RapidFire"))
-		break;
+				break;
 
 
 
+		}
 	}
 }

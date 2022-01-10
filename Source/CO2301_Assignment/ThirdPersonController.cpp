@@ -28,6 +28,12 @@ void AThirdPersonController::BeginPlay()
 	Super::BeginPlay();
 
 	MyPawn = GetPawn();
+
+	HUD = CreateWidget(this, HUDClass);
+	if (HUD != nullptr)
+	{
+		HUD->AddToViewport();
+	}
 }
 
 

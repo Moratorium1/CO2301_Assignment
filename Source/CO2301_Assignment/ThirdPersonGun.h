@@ -32,7 +32,8 @@ private:
 
 	void FireGrenade();
 	void SingleFire();
-	void SingleReload();
+	void SingleReloadStart();
+	void SingleReloadEnd();
 	void RapidFire();
 
 	UPROPERTY(VisibleAnywhere)
@@ -53,6 +54,9 @@ private:
 	UPROPERTY()
 	bool bFiring;
 
+	UPROPERTY()
+	bool bReloading;
+
 	//SingleFireStats
 	UPROPERTY(EditAnywhere)
 	int SingleAmmoMax = 10;
@@ -71,4 +75,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AProjectileGrenade> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere)
+	FTimerHandle ReloadTimer;
+
+	UPROPERTY(EditAnywhere)
+	float MaxReloadTime = 1.15f;
 };
