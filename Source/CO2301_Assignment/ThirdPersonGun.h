@@ -32,7 +32,8 @@ private:
 
 	void FireGrenade();
 	void SingleFire();
-	void SingleReload();
+	void ReloadStart();
+	void ReloadEnd();
 	void RapidFire();
 
 	UPROPERTY(VisibleAnywhere)
@@ -53,12 +54,32 @@ private:
 	UPROPERTY()
 	bool bFiring;
 
+	UPROPERTY()
+	FTimerHandle ReloadTimer;
+
+	UPROPERTY()
+	float MaxReloadTime = 1.15f;
+
 	//SingleFireStats
 	UPROPERTY(EditAnywhere)
 	int SingleAmmoMax = 10;
 
 	UPROPERTY(EditAnywhere)
 	int SingleAmmo;
+
+	//SingleFireStats
+	UPROPERTY(EditAnywhere)
+	int GrenadeAmmoMax = 3;
+
+	UPROPERTY(EditAnywhere)
+	int GrenadeAmmo;
+
+	//SingleFireStats
+	UPROPERTY(EditAnywhere)
+	int RapidAmmoMax = 20;
+
+	UPROPERTY(EditAnywhere)
+	int RapidAmmo;
 
 	UPROPERTY(EditAnywhere)
 	float Range = 1000;

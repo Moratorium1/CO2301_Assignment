@@ -133,4 +133,9 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	return DamageApplied;
 }
 
+float AThirdPersonCharacter::GetHealthPercentage() const
+{
+	return Health / HealthMax;
+}
+
 

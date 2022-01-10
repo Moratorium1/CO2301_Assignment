@@ -3,6 +3,7 @@
 #include "ThirdPersonGun.h"
 #include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 #include "ThirdPersonCharacter.h"
 
 // Sets default values
@@ -27,7 +28,9 @@ void AThirdPersonGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SingleAmmo = SingleAmmoMax;
+	SingleAmmo	= SingleAmmoMax;
+	GrenadeAmmo = GrenadeAmmoMax;
+	RapidAmmo	= RapidAmmoMax;
 
 }
 
@@ -67,11 +70,34 @@ void AThirdPersonGun::SingleFire()
 	SingleAmmo--;
 }
 
-void AThirdPersonGun::SingleReload()
+void AThirdPersonGun::ReloadStart()
 {
 	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
 	OwnerChar->bReloading = true;
-	UE_LOG(LogTemp, Warning, TEXT("Single Reload"));
+	
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AThirdPersonGun::ReloadEnd, MaxReloadTime, false);
+}
+
+
+void AThirdPersonGun::ReloadEnd()
+{
+	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
+	OwnerChar->bReloading = false;
+	
+	switch (Mode)
+	{
+		case 0:
+			GrenadeAmmo = GrenadeAmmoMax;
+		break;
+
+		case 1:
+			SingleAmmo = SingleAmmoMax;
+		break;
+
+		case 2:
+			//Machine gun
+		break;
+	}
 }
 
 void AThirdPersonGun::RapidFire()
@@ -115,9 +141,16 @@ void AThirdPersonGun::FireGrenade()
 {
 	FVector SpawnLocation	= ProjectileSpawn->GetComponentLocation();
 	FRotator SpawnRotation	= ProjectileSpawn->GetComponentRotation();
+	TArray<AActor*> GrenadeCount;
 
-	FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
-	FiredGrenade->SetOwner(GetOwner());
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProjectileGrenade::StaticClass(), GrenadeCount);
+
+		if (GrenadeCount.Num() < 1)
+		{
+			FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
+			FiredGrenade->SetOwner(GetOwner());
+			GrenadeAmmo--;
+		}
 }
 
 // Called every frame
@@ -151,15 +184,17 @@ void AThirdPersonGun::Fire()
 	switch (Mode)
 	{
 		case 0:
-			FireGrenade();
+			if (GrenadeAmmo > 0)
+				FireGrenade();
+			else
+				ReloadStart();
 		break;
 
 		case 1:
-			//if (SingleAmmo > 0)
+			if (SingleAmmo > 0)
 				SingleFire();
-			
-			//else
-			//	SingleReload();
+			else
+				ReloadStart();
 		break;
 
 		case 2:
