@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ThirdPersonCharacter.h"
 #include "ThirdPersonController.h"
+#include "ThirdPersonCharacter.h"
+
 
 void AThirdPersonController::SetupInputComponent()
 {
