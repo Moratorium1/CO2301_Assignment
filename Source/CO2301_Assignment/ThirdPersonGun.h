@@ -55,10 +55,13 @@ private:
 	bool bFiring;
 
 	UPROPERTY()
-	FTimerHandle ReloadTimer;
+	bool bReloading;
 
 	UPROPERTY()
-	float MaxReloadTime = 1.15f;
+	FTimerHandle ReloadTimer;
+
+	UPROPERTY(EditAnywhere)
+	float MaxReloadTime = 2.15f;
 
 	//SingleFireStats
 	UPROPERTY(EditAnywhere)

@@ -74,6 +74,7 @@ void AThirdPersonGun::ReloadStart()
 {
 	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
 	OwnerChar->bReloading = true;
+	bReloading = true;
 	
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AThirdPersonGun::ReloadEnd, MaxReloadTime, false);
 }
@@ -83,6 +84,7 @@ void AThirdPersonGun::ReloadEnd()
 {
 	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
 	OwnerChar->bReloading = false;
+	bReloading = false;
 	
 	switch (Mode)
 	{
@@ -156,7 +158,8 @@ void AThirdPersonGun::FireGrenade()
 // Called every frame
 void AThirdPersonGun::SwitchModeUp()
 {
-	Mode++;
+	if (!bReloading)
+		Mode++;
 
 	//Mode Wrap around
 	if (Mode > 2) Mode = 0;
@@ -164,7 +167,9 @@ void AThirdPersonGun::SwitchModeUp()
 
 void AThirdPersonGun::SwitchModeDown()
 {
-	Mode--;
+	if (!bReloading)
+		Mode--;
+
 	//Mode Wrap around
 	if (Mode < 0) Mode = 2;
 }
@@ -181,27 +186,30 @@ void AThirdPersonGun::Fire()
 		if an object is hit store it in a FHitResult and apply damage
 	*/
 
-	switch (Mode)
+	if (!bReloading)
 	{
+		switch (Mode)
+		{
 		case 0:
 			if (GrenadeAmmo > 0)
 				FireGrenade();
 			else
 				ReloadStart();
-		break;
+			break;
 
 		case 1:
 			if (SingleAmmo > 0)
 				SingleFire();
 			else
 				ReloadStart();
-		break;
+			break;
 
 		case 2:
 			UE_LOG(LogTemp, Warning, TEXT("RapidFire"))
-		break;
+				break;
 
 
 
+		}
 	}
 }

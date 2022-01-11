@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "ThirdPersonAIController.generated.h"
 
 /**
@@ -17,17 +18,38 @@ class CO2301_ASSIGNMENT_API AThirdPersonAIController : public AAIController
 public:
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
-private:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TArray<AActor*> Waypoints;
 
+private:
+	
 	UFUNCTION()
 	AActor* ChooseWaypoint();
 
+	UPROPERTY()
+	APawn* PlayerPawn;
+
+	//UFUNCTION()
+	//void RandomPatrol();
+
 	UFUNCTION()
-	void RandomPatrol();
+	bool IsPlayerInFront();
+
+	UFUNCTION()
+	bool PlayerSeen();
+
+	UFUNCTION()
+	void GetWaypoints();
+
+	UPROPERTY(EditAnywhere)
+	UBehaviorTree* AIBehavior;
 
 protected:
+
 	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 
 };
