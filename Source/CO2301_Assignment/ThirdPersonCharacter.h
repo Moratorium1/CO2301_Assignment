@@ -27,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool bReloading;
 
+	UPROPERTY(VisibleAnywhere)
+	float Health = 100.0f;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool bIsDead = false;
 
@@ -68,9 +71,5 @@ private:
 	AThirdPersonGun* ActiveWeapon;
 
 	UPROPERTY(VisibleAnywhere)
-	float Health = 100.0f;
-
-	UPROPERTY(VisibleAnywhere)
 	float HealthMax = 100.0f;
-
 };

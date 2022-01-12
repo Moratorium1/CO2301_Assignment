@@ -52,7 +52,11 @@ void AThirdPersonGun::SingleFire()
 	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;
 	//Perform line trace store hit object in HitResult
 
-	bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2);
+	FCollisionQueryParams Params;			// Line trace parameters
+	Params.AddIgnoredActor(this);			// Ignore the gun
+	Params.AddIgnoredActor(GetOwner());		// Ignore the owner of the gun
+
+	bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2, Params);
 
 	//If an object was hit 
 	if (bObjectHit)

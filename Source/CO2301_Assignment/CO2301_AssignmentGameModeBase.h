@@ -13,5 +13,5 @@ UCLASS()
 class CO2301_ASSIGNMENT_API ACO2301_AssignmentGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 };

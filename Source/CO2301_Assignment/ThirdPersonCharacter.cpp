@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ThirdPersonGun.h"
+#include "Components/CapsuleComponent.h"
 #include "ThirdPersonController.h"
 
 
@@ -129,6 +130,12 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	
 	if (Health <= 0) bIsDead = true;
 	UE_LOG(LogTemp, Warning, TEXT("Health left %f"), Health);
+
+	if (bIsDead)
+	{
+		DetachFromControllerPendingDestroy();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	return DamageApplied;
 }

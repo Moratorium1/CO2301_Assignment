@@ -13,5 +13,19 @@ UCLASS()
 class CO2301_ASSIGNMENT_API AThirdPersonGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	AThirdPersonGameMode();
+
+	UPROPERTY(EditAnywhere)
+		bool bAlarmed = false;
+
+private:
+
+	UFUNCTION()
+		void Alarmed();
+
+protected:
+	virtual void Tick(float DeltaTime) override;
 };
