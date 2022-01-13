@@ -7,6 +7,7 @@
 #include "ThirdPersonGun.h"
 #include "Components/CapsuleComponent.h"
 #include "ThirdPersonController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 
 

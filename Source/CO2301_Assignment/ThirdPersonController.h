@@ -41,5 +41,4 @@ private:
 	void CallSwitchWeaponUp();
 	void CallSwitchWeaponDown();
 
-	
 };
