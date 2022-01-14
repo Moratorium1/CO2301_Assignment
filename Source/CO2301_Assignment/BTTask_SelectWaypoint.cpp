@@ -19,9 +19,9 @@ EBTNodeResult::Type UBTTask_SelectWaypoint::ExecuteTask(UBehaviorTreeComponent& 
     if (AIController == nullptr)
         return EBTNodeResult::Failed;
 
-    int SelectedWayPoint = FMath::RandRange(0, AIController->Waypoints.Num() - 1);
+    int SelectedPatrolPoints = FMath::RandRange(0, AIController->PatrolPoints.Num() - 1);
 
-    OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), AIController->Waypoints[SelectedWayPoint]->GetActorLocation());
+    OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), AIController->PatrolPoints[SelectedPatrolPoints]->GetActorLocation());
 
     return EBTNodeResult::Type();
 }

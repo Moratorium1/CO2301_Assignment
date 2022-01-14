@@ -7,7 +7,9 @@
 #include "ThirdPersonGun.h"
 #include "Components/CapsuleComponent.h"
 #include "ThirdPersonController.h"
+#include "ThirdPersonAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ThirdPersonGameMode.h"
 
 
 
@@ -40,6 +42,12 @@ void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("Character Begin Play"));
+	AThirdPersonAIController* AIController = Cast<AThirdPersonAIController>(GetController());
+
+	if (AIController != nullptr)
+		AIController->BeginPlay();
+
 	ActiveWeapon = GetWorld()->SpawnActor<AThirdPersonGun>(WeaponClass);
 	ActiveWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_rSocket"));
 	ActiveWeapon->SetOwner(this);
@@ -58,8 +66,11 @@ void AThirdPersonCharacter::MoveForwards(float AxisAmount)
 	// Required since the blueprint is set to not inherit controller yaw
 	//This allows ther player to stand stationary and aim left and right without turning the whole character 
 	AController* CharController = GetController();
-	FRotator ControllerRotation = CharController->GetControlRotation();
+	if (CharController == nullptr)
+		return;
+
 	FRotator CharRotation = GetActorRotation();
+	FRotator ControllerRotation = CharController->GetControlRotation();
 	FRotator NewRotation = FRotator(CharRotation.Pitch, ControllerRotation.Yaw, CharRotation.Roll);
 
 	SetActorRotation(NewRotation);
@@ -130,10 +141,15 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	Health -= DamageApplied;
 	
 	if (Health <= 0) bIsDead = true;
-	UE_LOG(LogTemp, Warning, TEXT("Health left %f"), Health);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Health left %f"), Health);
 
 	if (bIsDead)
 	{
+		AThirdPersonGameMode* GameMode = Cast<AThirdPersonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode != nullptr)
+			GameMode->PawnKilled(this);
+
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}

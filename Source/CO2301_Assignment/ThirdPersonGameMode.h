@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "ThirdPersonCharacter.h"
 #include "ThirdPersonGameMode.generated.h"
 
 /**
@@ -19,13 +20,46 @@ public:
 	AThirdPersonGameMode();
 
 	UPROPERTY(EditAnywhere)
-		bool bAlarmed = false;
+	bool bAlarmed = false;
+
+	UPROPERTY(EditAnywhere)
+	bool bPreviouslyAlarmed = false;
+
+	UFUNCTION()
+	void EnemyCount();
+
+	UPROPERTY(EditAnywhere)
+	int EnemyNum;
+
+	UFUNCTION()
+	void PawnKilled(APawn* PawnKilled);
 
 private:
 
 	UFUNCTION()
-		void Alarmed();
+	void Alarmed();
+
+	UPROPERTY()
+	TArray<AActor*> Waypoints;
+
+	UPROPERTY()
+	TArray<AActor*> SpawnPoints;
+
+	UFUNCTION()
+	void GetSpawnPoints();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AThirdPersonCharacter> EnemyClass;
+
+	UPROPERTY()
+	TArray<AActor*> Enemies;
+
+	UFUNCTION()
+	void GameOver(bool PlayerWon);
 
 protected:
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginPlay() override;
+
 };

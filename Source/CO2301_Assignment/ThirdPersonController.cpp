@@ -4,6 +4,13 @@
 #include "ThirdPersonCharacter.h"
 
 
+void AThirdPersonController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
+{
+	Super::GameHasEnded(EndGameFocus, bIsWinner);
+
+	UE_LOG(LogTemp, Warning, TEXT("Player Won"));
+}
+
 void AThirdPersonController::SetupInputComponent()
 {
 	Super::SetupInputComponent();

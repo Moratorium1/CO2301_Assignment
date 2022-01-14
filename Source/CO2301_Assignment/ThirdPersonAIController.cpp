@@ -5,16 +5,35 @@
 #include "Engine/TargetPoint.h"
 #include "ThirdPersonAIController.h"
 
+
+
 void AThirdPersonAIController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("AI Controller Begin Play"));
 
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	
 	if (AIBehavior != nullptr)
 		RunBehaviorTree(AIBehavior);
 
+	GetPatrolPoints();
+}
+
+void AThirdPersonAIController::GetPatrolPoints()
+{
+	// Fill the Waypoints array with all target points
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), Waypoints);
+
+	// Loop through the Waypoints array and filter out any targetpoint with the SpawnPoint Tag
+	for (int i = 0; i < Waypoints.Num() - 1; i++)
+	{
+		if (!Waypoints[i]->ActorHasTag(TEXT("SpawnPoint")))
+		{
+			PatrolPoints.Add(Waypoints[i]);
+		}
+	}
 }
 
 bool AThirdPersonAIController::IsPlayerInFront()

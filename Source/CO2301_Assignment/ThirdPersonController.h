@@ -12,6 +12,10 @@ class CO2301_ASSIGNMENT_API AThirdPersonController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+
+	virtual void GameHasEnded(AActor* EndGameFocus, bool bIsWinner) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

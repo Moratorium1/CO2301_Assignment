@@ -39,10 +39,13 @@ void AThirdPersonGun::SingleFire()
 	//Initialise Viewport Variables
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	AController* OwnerController = OwnerPawn->GetController();
+	if (OwnerController == nullptr)
+		return;
+
 	FVector		ViewLocation;
 	FRotator	ViewRotation;
 
-	//Initialise LineTrace Variables
+	//Initialise LineTrace Variablesw
 	FHitResult HitResult;
 	FVector LineTraceEnd;
 	bool bObjectHit;

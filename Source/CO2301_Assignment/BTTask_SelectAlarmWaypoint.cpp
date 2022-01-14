@@ -5,6 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ThirdPersonAIController.h"
+#include "ThirdPersonGameMode.h"
 
 UBTTask_SelectAlarmWaypoint::UBTTask_SelectAlarmWaypoint()
 {
@@ -21,12 +22,20 @@ EBTNodeResult::Type UBTTask_SelectAlarmWaypoint::ExecuteTask(UBehaviorTreeCompon
 	if (AIController == nullptr)
 		return EBTNodeResult::Failed;
 
+	AThirdPersonGameMode* GameMode = Cast<AThirdPersonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (GameMode == nullptr)
+		return EBTNodeResult::Failed;
+
+	if (GameMode->bAlarmed)
+		return EBTNodeResult::Failed;
+
 	// Loop through array searching for way point with the Alarm tag
-	for (int i = 0; i < AIController->Waypoints.Num() - 1; i++)
+	for (int i = 0; i < AIController->PatrolPoints.Num() - 1; i++)
 	{
-		if (AIController->Waypoints[i]->ActorHasTag(TEXT("Alarm")))
+		if (AIController->PatrolPoints[i]->ActorHasTag(TEXT("Alarm")))
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), AIController->Waypoints[i]);
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), AIController->PatrolPoints[i]);
 			return EBTNodeResult::Succeeded;
 		}
 	}

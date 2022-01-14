@@ -15,13 +15,19 @@ class CO2301_ASSIGNMENT_API AThirdPersonAIController : public AAIController
 public:
 
 	UPROPERTY(VisibleAnywhere)
-	TArray<AActor*> Waypoints;
+	TArray<AActor*> PatrolPoints;
 
 	UFUNCTION()
 	bool PlayerSeen();
 
+	UFUNCTION()
+	virtual void BeginPlay() override;
+
 private:
 	
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> Waypoints;
+
 	UPROPERTY()
 	APawn* PlayerPawn;
 
@@ -31,7 +37,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UBehaviorTree* AIBehavior;
 
-protected:
+	UFUNCTION()
+	void GetPatrolPoints();
 
-	virtual void BeginPlay() override;
 };
