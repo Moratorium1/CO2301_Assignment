@@ -22,7 +22,6 @@ void AThirdPersonGameMode::GetSpawnPoints()
 	{
 		if (Waypoints[i]->ActorHasTag(TEXT("SpawnPoint")))
 		{
-			UE_LOG(LogTexture, Warning, TEXT("SpawnPoints"));
 			SpawnPoints.Add(Waypoints[i]);
 		}
 	}
@@ -38,22 +37,30 @@ void AThirdPersonGameMode::BeginPlay()
 
 void AThirdPersonGameMode::PawnKilled(APawn* PawnKilled)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Pawn Killed"));
-
 	AThirdPersonController* PlayerController = Cast<AThirdPersonController>(PawnKilled->GetController());
 	if (PlayerController != nullptr)
-		PlayerController->GameHasEnded(nullptr, false);
+	{
+		PlayerController->GameHasEnded(PlayerController->GetPawn(), false);
+		return;
+	}
 
 	EnemyNum--;
+
+	if (EnemyNum <= 0)
+	{	
+		PlayerController = Cast<AThirdPersonController>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetController());
+		if (PlayerController == nullptr) return;
+
+		PlayerController->GameHasEnded(PlayerController->GetPawn(), true);
+	}
 }
 
 void AThirdPersonGameMode::Alarmed()
 {
-	UE_LOG(LogTexture, Warning, TEXT("Alarm Raised"));
-
 	for (int i = 0; i <= SpawnPoints.Num() - 1; i++)
 	{
 		GetWorld()->SpawnActor<AThirdPersonCharacter>(EnemyClass, SpawnPoints[i]->GetActorLocation(), SpawnPoints[i]->GetActorRotation());
+		EnemyNum++;
 	}
 
 	bPreviouslyAlarmed = true;
@@ -65,15 +72,6 @@ void AThirdPersonGameMode::Tick(float DeltaTime)
 
 	if ((bAlarmed) && (!bPreviouslyAlarmed))
 		Alarmed();
-
-	if (EnemyNum <= 0)
-	{
-		AThirdPersonController* PlayerController = Cast<AThirdPersonController>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetController());
-		if (PlayerController == nullptr) return;
-
-		if (PlayerController != nullptr)
-			PlayerController->GameHasEnded(nullptr, true);
-	}
 }
 
 void AThirdPersonGameMode::EnemyCount()
@@ -81,10 +79,5 @@ void AThirdPersonGameMode::EnemyCount()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), EnemyClass, Enemies);
 
 	EnemyNum = Enemies.Num();
-}
-
-void AThirdPersonGameMode::GameOver(bool PlayerWon)
-{
-
 }
 

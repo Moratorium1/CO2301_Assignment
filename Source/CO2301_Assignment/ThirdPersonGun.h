@@ -8,6 +8,8 @@
 #include "ProjectileGrenade.h"
 #include "ThirdPersonGun.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS()
 class CO2301_ASSIGNMENT_API AThirdPersonGun : public AActor
 {
@@ -97,5 +99,5 @@ private:
 	TSubclassOf<AProjectileGrenade> ProjectileClass;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* MuzzleFlash;
+	UNiagaraSystem* MuzzleFlash;
 };

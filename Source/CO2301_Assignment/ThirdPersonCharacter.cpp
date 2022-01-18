@@ -42,7 +42,6 @@ void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Character Begin Play"));
 	AThirdPersonAIController* AIController = Cast<AThirdPersonAIController>(GetController());
 
 	if (AIController != nullptr)
@@ -142,10 +141,10 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	
 	if (Health <= 0) bIsDead = true;
 
-	//UE_LOG(LogTemp, Warning, TEXT("Health left %f"), Health);
-
 	if (bIsDead)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("IS DEAD"));
+
 		AThirdPersonGameMode* GameMode = Cast<AThirdPersonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode != nullptr)
 			GameMode->PawnKilled(this);

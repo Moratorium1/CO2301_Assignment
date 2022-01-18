@@ -16,16 +16,36 @@ public:
 
 	virtual void GameHasEnded(AActor* EndGameFocus, bool bIsWinner) override;
 
+	virtual void RestartLevel() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
 
+	UPROPERTY()
+	FTimerHandle RestartTimer;
+
+	UPROPERTY(EditAnywhere)
+	float RestartTime = 5.0f;
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HUDClass;
 
 	UUserWidget* HUD;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> LoseHUDClass;
+
+	UUserWidget* LoseHUD;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> WinHUDClass;
+
+	UUserWidget* WinHUD;
+
+	// Player Control Functions
 
 	virtual void SetupInputComponent() override;
 

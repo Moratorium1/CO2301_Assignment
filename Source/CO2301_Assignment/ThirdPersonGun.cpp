@@ -5,6 +5,9 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 #include "ThirdPersonCharacter.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "C:/Program Files/Epic Games/UE_4.26/Engine/Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponentPool.h"
 
 // Sets default values
 AThirdPersonGun::AThirdPersonGun()
@@ -195,6 +198,9 @@ void AThirdPersonGun::Fire()
 
 	if (!bReloading)
 	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true, ENCPoolMethod::AutoRelease, true);
+								 //SpawnSystemAtLocation(const UObject * WorldContextObject, UNiagaraSystem * SystemTemplate, FVector SpawnLocation, FRotator SpawnRotation, FVector Scale, bool bAutoDestroy, bool bAutoActivate, ENCPoolMethod PoolingMethod, bool bPreCullCheck)
+
 		switch (Mode)
 		{
 		case 0:

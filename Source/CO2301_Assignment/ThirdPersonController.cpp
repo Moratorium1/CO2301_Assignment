@@ -2,13 +2,21 @@
 
 #include "ThirdPersonController.h"
 #include "ThirdPersonCharacter.h"
+#include "TimerManager.h"
+#include "Blueprint/UserWidget.h"
 
 
-void AThirdPersonController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
+void AThirdPersonController::BeginPlay()
 {
-	Super::GameHasEnded(EndGameFocus, bIsWinner);
+	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Player Won"));
+	MyPawn = GetPawn();
+
+	HUD = CreateWidget(this, HUDClass);
+	if (HUD != nullptr)
+	{
+		HUD->AddToViewport();
+	}
 }
 
 void AThirdPersonController::SetupInputComponent()
@@ -30,20 +38,6 @@ void AThirdPersonController::SetupInputComponent()
 	InputComponent->BindAction("SwitchUp",	IE_Pressed,		this, &AThirdPersonController::CallSwitchWeaponUp);
 	InputComponent->BindAction("SwitchDown", IE_Pressed,	this, &AThirdPersonController::CallSwitchWeaponDown);
 }
-
-void AThirdPersonController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	MyPawn = GetPawn();
-
-	HUD = CreateWidget(this, HUDClass);
-	if (HUD != nullptr)
-	{
-		HUD->AddToViewport();
-	}
-}
-
 
 void AThirdPersonController::CallMoveForwards(float AxisAmount)
 {
@@ -139,4 +133,35 @@ void AThirdPersonController::CallSwitchWeaponDown()
 	{
 		Cast<AThirdPersonCharacter>(MyPawn)->SwitchWeaponDown();
 	}
+}
+
+void AThirdPersonController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
+{
+	Super::GameHasEnded(EndGameFocus, bIsWinner);
+
+	GetWorldTimerManager().SetTimer(RestartTimer, this, &AThirdPersonController::RestartLevel, RestartTime);
+
+	if (!bIsWinner)
+	{
+		LoseHUD = CreateWidget(this, LoseHUDClass);
+		if (LoseHUD != nullptr)
+		{
+			LoseHUD->AddToViewport();
+		}
+	}
+	else
+	{
+		WinHUD = CreateWidget(this, WinHUDClass);
+		if (WinHUD != nullptr)
+		{
+			WinHUD->AddToViewport();
+		}
+	}
+
+}
+
+void AThirdPersonController::RestartLevel()
+{
+	Super::RestartLevel();
+
 }

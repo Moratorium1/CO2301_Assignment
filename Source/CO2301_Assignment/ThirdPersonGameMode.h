@@ -54,9 +54,6 @@ private:
 	UPROPERTY()
 	TArray<AActor*> Enemies;
 
-	UFUNCTION()
-	void GameOver(bool PlayerWon);
-
 protected:
 	virtual void Tick(float DeltaTime) override;
 
