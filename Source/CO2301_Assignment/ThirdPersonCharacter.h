@@ -18,9 +18,6 @@ public:
 	// Sets default values for this character's properties
 	AThirdPersonCharacter();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool Ironsight;
 
@@ -32,6 +29,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
 	bool bIsDead = false;
+
+	UFUNCTION()
+	bool HasDied();
 
 	// Player Controls
 	void MoveForwards(float AxisAmount);
@@ -55,6 +55,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 private:
 

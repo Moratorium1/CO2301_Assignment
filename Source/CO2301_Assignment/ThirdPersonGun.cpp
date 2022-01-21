@@ -198,7 +198,7 @@ void AThirdPersonGun::Fire()
 
 	if (!bReloading)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true, ENCPoolMethod::AutoRelease, true);
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true, ENCPoolMethod::AutoRelease, true);
 								 //SpawnSystemAtLocation(const UObject * WorldContextObject, UNiagaraSystem * SystemTemplate, FVector SpawnLocation, FRotator SpawnRotation, FVector Scale, bool bAutoDestroy, bool bAutoActivate, ENCPoolMethod PoolingMethod, bool bPreCullCheck)
 
 		switch (Mode)

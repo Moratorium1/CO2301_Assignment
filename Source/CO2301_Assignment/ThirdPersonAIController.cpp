@@ -4,6 +4,7 @@
 #include "ThirdPersonAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/TargetPoint.h"
+#include "ThirdPersonCharacter.h"
 
 void AThirdPersonAIController::BeginPlay()
 {
@@ -15,6 +16,17 @@ void AThirdPersonAIController::BeginPlay()
 		RunBehaviorTree(AIBehavior);
 
 	GetPatrolPoints();
+}
+
+bool AThirdPersonAIController::HasDied() const
+{
+	AThirdPersonCharacter* ControlledCharcater = Cast<AThirdPersonCharacter>(GetPawn());
+	if (ControlledCharcater != nullptr)
+	{
+		return ControlledCharcater->HasDied();
+	}
+
+	return true;
 }
 
 void AThirdPersonAIController::GetPatrolPoints()

@@ -23,6 +23,8 @@ public:
 	UFUNCTION()
 	virtual void BeginPlay() override;
 
+	bool HasDied() const;
+
 private:
 	
 	UPROPERTY(VisibleAnywhere)

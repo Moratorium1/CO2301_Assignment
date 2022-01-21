@@ -56,7 +56,6 @@ void AThirdPersonCharacter::BeginPlay()
 void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AThirdPersonCharacter::MoveForwards(float AxisAmount)
@@ -108,13 +107,15 @@ void AThirdPersonCharacter::EndCrouch()
 }
 
 void AThirdPersonCharacter::StartIronSight()
-{
-	Ironsight = true;
+{	
+	if (!bReloading)
+		Ironsight = true;
 }
 
 void AThirdPersonCharacter::EndIronSight()
 {
-	Ironsight = false;
+	if (!bReloading)
+		Ironsight = false;
 }
 
 void AThirdPersonCharacter::FireWeapon()
@@ -124,31 +125,41 @@ void AThirdPersonCharacter::FireWeapon()
 
 void AThirdPersonCharacter::SwitchWeaponUp()
 {
-	ActiveWeapon->SwitchModeUp();
+	if (!bReloading)
+		ActiveWeapon->SwitchModeUp();
 }
 
 void AThirdPersonCharacter::SwitchWeaponDown()
 {
-	ActiveWeapon->SwitchModeDown();
+	if (!bReloading)
+		ActiveWeapon->SwitchModeDown();
+}
+
+bool AThirdPersonCharacter::HasDied()
+{
+	return Health <= 0;
 }
 
 float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	DamageApplied = FMath::Min(Health, DamageApplied);
 
+	//Damage is clamped so that it cannot be greater than the remaining health of the character and then applied
+	DamageApplied = FMath::Min(Health, DamageApplied);
 	Health -= DamageApplied;
 	
-	if (Health <= 0) bIsDead = true;
-
-	if (bIsDead)
+	//If HasDied returns true the character has died 
+	if (HasDied())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IS DEAD"));
+		bIsDead = true;		//bIsDead set to true this variable is used for animation purposes
 
+		//Get the GameMode and if not nullptr call the PawnKilledMethod
 		AThirdPersonGameMode* GameMode = Cast<AThirdPersonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode != nullptr)
 			GameMode->PawnKilled(this);
 
+		//Dettaching the controller prevents the controllers controlling their characters - AI Pawns stop moving after death
+		//Setting capsule components to NoCollision allows the player to walk over and shoot through dead enemies
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}

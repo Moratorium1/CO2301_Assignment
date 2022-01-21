@@ -7,9 +7,6 @@
 #include "ThirdPersonCharacter.h"
 #include "ThirdPersonGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class CO2301_ASSIGNMENT_API AThirdPersonGameMode : public AGameModeBase
 {
@@ -24,12 +21,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bPreviouslyAlarmed = false;
-
-	UFUNCTION()
-	void EnemyCount();
-
-	UPROPERTY(EditAnywhere)
-	int EnemyNum;
 
 	UFUNCTION()
 	void PawnKilled(APawn* PawnKilled);
@@ -51,8 +42,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AThirdPersonCharacter> EnemyClass;
 
-	UPROPERTY()
-	TArray<AActor*> Enemies;
+	void EndGame(bool bIsPlayerWinner);
 
 protected:
 	virtual void Tick(float DeltaTime) override;
