@@ -159,6 +159,7 @@ void AThirdPersonGun::FireGrenade()
 
 		if (GrenadeCount.Num() < 1)
 		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GrenadeLaunched, GetActorLocation());
 			FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
 			FiredGrenade->SetOwner(GetOwner());
 			GrenadeAmmo--;

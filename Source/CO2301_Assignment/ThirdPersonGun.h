@@ -100,4 +100,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* MuzzleFlash;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* GrenadeLaunched;
+
 };
