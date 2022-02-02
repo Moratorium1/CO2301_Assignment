@@ -8,13 +8,11 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "C:/Program Files/Epic Games/UE_4.26/Engine/Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponentPool.h"
+#include "DestructibleComponent.h"
 
 // Sets default values
 AThirdPersonGun::AThirdPersonGun()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
@@ -33,52 +31,9 @@ void AThirdPersonGun::BeginPlay()
 
 	SingleAmmo	= SingleAmmoMax;
 	GrenadeAmmo = GrenadeAmmoMax;
-	RapidAmmo	= RapidAmmoMax;
-
 }
 
-void AThirdPersonGun::SingleFire()
-{
-	//Initialise Viewport Variables
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	AController* OwnerController = OwnerPawn->GetController();
-	if (OwnerController == nullptr)
-		return;
 
-	FVector		ViewLocation;
-	FRotator	ViewRotation;
-
-	//Initialise LineTrace Variablesw
-	FHitResult HitResult;
-	FVector LineTraceEnd;
-	bool bObjectHit;
-
-	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
-	//Work out end of line trace
-	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;
-	//Perform line trace store hit object in HitResult
-
-	FCollisionQueryParams Params;			// Line trace parameters
-	Params.AddIgnoredActor(this);			// Ignore the gun
-	Params.AddIgnoredActor(GetOwner());		// Ignore the owner of the gun
-
-	bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2, Params);
-
-	//If an object was hit 
-	if (bObjectHit)
-	{
-		//Get the actor from the hit result so that a take damage function can be called
-		AActor* ActorHit = HitResult.GetActor();
-
-		if (ActorHit != nullptr)
-		{
-			//DrawDebugPoint(GetWorld(), HitResult.Location, 20, FColor::Red, true);
-			UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
-		}
-	}
-
-	SingleAmmo--;
-}
 
 void AThirdPersonGun::ReloadStart()
 {
@@ -105,65 +60,7 @@ void AThirdPersonGun::ReloadEnd()
 		case 1:
 			SingleAmmo = SingleAmmoMax;
 		break;
-
-		case 2:
-			//Machine gun
-		break;
 	}
-}
-
-void AThirdPersonGun::RapidFire()
-{
-	if (bFiring)
-	{
-		//Initialise Viewport Variables
-		APawn* OwnerPawn = Cast<APawn>(GetOwner());
-		AController* OwnerController = OwnerPawn->GetController();
-		FVector		ViewLocation;
-		FRotator	ViewRotation;
-
-		//Initialise LineTrace Variables
-		FHitResult HitResult;
-		FVector LineTraceEnd;
-		bool bObjectHit;
-
-		OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
-		//Work out end of line trace
-		LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;
-		//Perform line trace store hit object in HitResult
-
-		bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2);
-
-		//If an object was hit 
-		if (bObjectHit)
-		{
-			//Get the actor from the hit result so that a take damage function can be called
-			AActor* ActorHit = HitResult.GetActor();
-
-			if (ActorHit != nullptr)
-			{
-				DrawDebugPoint(GetWorld(), HitResult.Location, 20, FColor::Red, true);
-				UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
-			}
-		}
-	}
-}
-
-void AThirdPersonGun::FireGrenade()
-{
-	FVector SpawnLocation	= ProjectileSpawn->GetComponentLocation();
-	FRotator SpawnRotation	= ProjectileSpawn->GetComponentRotation();
-	TArray<AActor*> GrenadeCount;
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProjectileGrenade::StaticClass(), GrenadeCount);
-
-		if (GrenadeCount.Num() < 1)
-		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GrenadeLaunched, GetActorLocation());
-			FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);
-			FiredGrenade->SetOwner(GetOwner());
-			GrenadeAmmo--;
-		}
 }
 
 // Called every frame
@@ -173,7 +70,7 @@ void AThirdPersonGun::SwitchModeUp()
 		Mode++;
 
 	//Mode Wrap around
-	if (Mode > 2) Mode = 0;
+	if (Mode > ModeMax) Mode = ModeMin;
 }
 
 void AThirdPersonGun::SwitchModeDown()
@@ -182,12 +79,7 @@ void AThirdPersonGun::SwitchModeDown()
 		Mode--;
 
 	//Mode Wrap around
-	if (Mode < 0) Mode = 2;
-}
-
-void AThirdPersonGun::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	if (Mode < ModeMin) Mode = ModeMax;
 }
 
 void AThirdPersonGun::Fire()
@@ -217,13 +109,78 @@ void AThirdPersonGun::Fire()
 			else
 				ReloadStart();
 			break;
-
-		case 2:
-			UE_LOG(LogTemp, Warning, TEXT("RapidFire"))
-				break;
-
-
-
 		}
+	}
+}
+
+void AThirdPersonGun::SingleFire()
+{
+	// Reduce Single Fire Weapon Ammo
+	SingleAmmo--;
+
+	// Get the pawn to get the controller to then get the viewport
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	AController* OwnerController = OwnerPawn->GetController();
+	if (OwnerController == nullptr)
+		return;
+
+	// Get the view loaction and rotation
+	FVector		ViewLocation;
+	FRotator	ViewRotation;
+	OwnerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	
+	// Set Parameters of the LineTrace
+	FCollisionQueryParams Params;											// Line trace parameters
+	Params.AddIgnoredActor(this);											// Ignore the gun
+	Params.AddIgnoredActor(GetOwner());										// Ignore the owner of the gun
+	FVector	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;	// Workout where to end the LineTrace
+	
+	FHitResult	HitResult;
+	// Performing a line trace returns a bool & stores infomation about object hit in HitResult
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2, Params))
+	{
+		//Get the actor from the hit result so that a take damage function can be called
+		AActor* ActorHit = HitResult.GetActor();
+		if (ActorHit == nullptr)
+			return;
+
+		UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
+
+		UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(HitResult.Component);
+		if (MeshComponent && ActorHit->IsRootComponentMovable())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Actor Hit Moveable"));
+
+			FVector Forwards = this->GetActorForwardVector();
+			MeshComponent->AddImpulse(-Forwards * 1000 * MeshComponent->GetMass());
+		}
+
+		UDestructibleComponent* DestructibleMesh = Cast<UDestructibleComponent>(HitResult.Component);
+		if (DestructibleMesh && ActorHit->IsRootComponentMovable())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Destruct Hit Moveable"));
+
+			FVector Forwards = this->GetActorForwardVector();
+			DestructibleMesh->AddImpulse(-Forwards * 1000 * DestructibleMesh->GetMass());
+		}
+	}
+}
+
+void AThirdPersonGun::FireGrenade()
+{
+	// Get ProjectileSpawn location and Rotation
+	FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
+	FRotator SpawnRotation = ProjectileSpawn->GetComponentRotation();
+
+	// Create an array and fill it with all the actors of the AProjectileGrenades class currently in the world
+	TArray<AActor*> GrenadeCount;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProjectileGrenade::StaticClass(), GrenadeCount);
+
+	if (GrenadeCount.Num() < 1)	// Only fire a grenade if there is not currently a grenade in the world - The number of elements in Grenade count is less than 0
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GrenadeLaunched, GetActorLocation());						// Play Grenade Launched sound
+		FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);	// Spawn the Grenade
+		FiredGrenade->SetOwner(GetOwner());									// Set the Owner of the grenade to the owner of the gun - could use to disable friendly fire
+		GrenadeAmmo--;														// Decrement grenade Ammo
 	}
 }

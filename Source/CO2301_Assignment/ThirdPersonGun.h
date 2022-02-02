@@ -19,9 +19,6 @@ public:
 	// Sets default values for this actor's properties
 	AThirdPersonGun();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	void Fire();
 	void SwitchModeUp();
 	void SwitchModeDown();
@@ -36,7 +33,6 @@ private:
 	void SingleFire();
 	void ReloadStart();
 	void ReloadEnd();
-	void RapidFire();
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -51,10 +47,9 @@ private:
 	AProjectileGrenade* FiredGrenade;
 
 	UPROPERTY()
-	int Mode = 1;
-
-	UPROPERTY()
-	bool bFiring;
+	int Mode	= 1;
+	int ModeMax = 1;
+	int ModeMin = 0;
 
 	UPROPERTY()
 	bool bReloading;
@@ -79,18 +74,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	int GrenadeAmmo;
 
-	//SingleFireStats
-	UPROPERTY(EditAnywhere)
-	int RapidAmmoMax = 20;
-
-	UPROPERTY(EditAnywhere)
-	int RapidAmmo;
-
 	UPROPERTY(EditAnywhere)
 	float Range = 1000;
 
 	UPROPERTY(EditAnywhere)
-	float Damage = 10.0f;
+	float Damage = 20.0f;
 
 	UPROPERTY(EditAnywhere)
 	float Recoil = 30.0f;

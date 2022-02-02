@@ -21,6 +21,10 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* RootComp;
+
 	UFUNCTION()
 	void OnBarrelFracture(const FVector& HitPoint, const FVector& HitDirection);
 
