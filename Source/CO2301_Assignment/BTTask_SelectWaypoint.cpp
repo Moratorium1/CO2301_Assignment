@@ -15,12 +15,12 @@ EBTNodeResult::Type UBTTask_SelectWaypoint::ExecuteTask(UBehaviorTreeComponent& 
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     AThirdPersonAIController* AIController = Cast<AThirdPersonAIController>(OwnerComp.GetAIOwner());
+    if (AIController == nullptr) return EBTNodeResult::Failed;
 
-    if (AIController == nullptr)
-        return EBTNodeResult::Failed;
-
+    // Select a random value between 0 and the total number of waypoints
     int SelectedPatrolPoints = FMath::RandRange(0, AIController->PatrolPoints.Num() - 1);
 
+    // Pass the location of the randomly selected waypoint to the blackboard key
     OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), AIController->PatrolPoints[SelectedPatrolPoints]->GetActorLocation());
 
     return EBTNodeResult::Type();

@@ -5,8 +5,7 @@
 
 ADestructibleBarrel::ADestructibleBarrel()
 {
-	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
-	SetRootComponent(RootComp);
+
 }
 
 void ADestructibleBarrel::BeginPlay()

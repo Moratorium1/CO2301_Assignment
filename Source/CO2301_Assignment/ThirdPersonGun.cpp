@@ -7,7 +7,6 @@
 #include "ThirdPersonCharacter.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "C:/Program Files/Epic Games/UE_4.26/Engine/Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponentPool.h"
 #include "DestructibleComponent.h"
 
 // Sets default values
@@ -53,33 +52,32 @@ void AThirdPersonGun::ReloadEnd()
 	
 	switch (Mode)
 	{
-		case 0:
+		case EWEAPONMODE::GRENADE:
 			GrenadeAmmo = GrenadeAmmoMax;
 		break;
 
-		case 1:
+		case EWEAPONMODE::DEFAULT:
 			SingleAmmo = SingleAmmoMax;
 		break;
 	}
 }
 
 // Called every frame
-void AThirdPersonGun::SwitchModeUp()
+void AThirdPersonGun::SwitchMode()
 {
+	/* If the character is not reloading swap from the current mode to the other */
+
 	if (!bReloading)
-		Mode++;
+		switch (Mode)
+		{
+			case EWEAPONMODE::GRENADE:
+			Mode = EWEAPONMODE::DEFAULT;
+			break;
 
-	//Mode Wrap around
-	if (Mode > ModeMax) Mode = ModeMin;
-}
-
-void AThirdPersonGun::SwitchModeDown()
-{
-	if (!bReloading)
-		Mode--;
-
-	//Mode Wrap around
-	if (Mode < ModeMin) Mode = ModeMax;
+			case EWEAPONMODE::DEFAULT:
+			Mode = EWEAPONMODE::GRENADE;
+			break;
+		}
 }
 
 void AThirdPersonGun::Fire()
@@ -121,8 +119,7 @@ void AThirdPersonGun::SingleFire()
 	// Get the pawn to get the controller to then get the viewport
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	AController* OwnerController = OwnerPawn->GetController();
-	if (OwnerController == nullptr)
-		return;
+	if (OwnerController == nullptr) return;
 
 	// Get the view loaction and rotation
 	FVector		ViewLocation;
@@ -136,6 +133,9 @@ void AThirdPersonGun::SingleFire()
 	FVector	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;	// Workout where to end the LineTrace
 	
 	FHitResult	HitResult;
+
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponFired, GetActorLocation());
+
 	// Performing a line trace returns a bool & stores infomation about object hit in HitResult
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2, Params))
 	{
@@ -149,19 +149,15 @@ void AThirdPersonGun::SingleFire()
 		UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(HitResult.Component);
 		if (MeshComponent && ActorHit->IsRootComponentMovable())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Actor Hit Moveable"));
-
 			FVector Forwards = this->GetActorForwardVector();
-			MeshComponent->AddImpulse(-Forwards * 1000 * MeshComponent->GetMass());
+			MeshComponent->AddImpulse(-Forwards * Force * MeshComponent->GetMass());
 		}
 
 		UDestructibleComponent* DestructibleMesh = Cast<UDestructibleComponent>(HitResult.Component);
 		if (DestructibleMesh && ActorHit->IsRootComponentMovable())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Destruct Hit Moveable"));
-
 			FVector Forwards = this->GetActorForwardVector();
-			DestructibleMesh->AddImpulse(-Forwards * 1000 * DestructibleMesh->GetMass());
+			DestructibleMesh->AddImpulse(-Forwards * Force * DestructibleMesh->GetMass());
 		}
 	}
 }
@@ -172,11 +168,12 @@ void AThirdPersonGun::FireGrenade()
 	FVector SpawnLocation = ProjectileSpawn->GetComponentLocation();
 	FRotator SpawnRotation = ProjectileSpawn->GetComponentRotation();
 
-	// Create an array and fill it with all the actors of the AProjectileGrenades class currently in the world
+	// Create an array and fill it with all the actors of the AProjectileGrenades class currently in the world.
 	TArray<AActor*> GrenadeCount;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProjectileGrenade::StaticClass(), GrenadeCount);
 
-	if (GrenadeCount.Num() < 1)	// Only fire a grenade if there is not currently a grenade in the world - The number of elements in Grenade count is less than 0
+	// Only fire a grenade if there less grenade actors in the world than the maximum grenade count value - default is 1.
+	if (GrenadeCount.Num() < MaxGrenadeCount)	
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GrenadeLaunched, GetActorLocation());						// Play Grenade Launched sound
 		FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);	// Spawn the Grenade

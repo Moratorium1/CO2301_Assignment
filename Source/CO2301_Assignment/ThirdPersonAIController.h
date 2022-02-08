@@ -42,4 +42,6 @@ private:
 	UFUNCTION()
 	void GetPatrolPoints();
 
+	UPROPERTY(EditAnywhere)
+	float Range = 1000;
 };

@@ -123,16 +123,12 @@ void AThirdPersonCharacter::FireWeapon()
 	ActiveWeapon->Fire();
 }
 
-void AThirdPersonCharacter::SwitchWeaponUp()
+void AThirdPersonCharacter::SwitchWeapon()
 {
-	if (!bReloading)
-		ActiveWeapon->SwitchModeUp();
-}
+	/* If the character is not reloading call the switch mode function of the weapon */
 
-void AThirdPersonCharacter::SwitchWeaponDown()
-{
 	if (!bReloading)
-		ActiveWeapon->SwitchModeDown();
+		ActiveWeapon->SwitchMode();
 }
 
 bool AThirdPersonCharacter::HasDied()
@@ -163,7 +159,6 @@ float AThirdPersonCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-
 	return DamageApplied;
 }
 

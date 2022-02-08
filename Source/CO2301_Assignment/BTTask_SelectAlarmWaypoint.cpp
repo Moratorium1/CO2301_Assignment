@@ -34,7 +34,7 @@ EBTNodeResult::Type UBTTask_SelectAlarmWaypoint::ExecuteTask(UBehaviorTreeCompon
 	for (int i = 0; i < AIController->PatrolPoints.Num() - 1; i++)
 	{
 		if (AIController->PatrolPoints[i]->ActorHasTag(TEXT("Alarm")))
-		{
+		{	// Update the blackboard key selected with the object for the alarm waypoint
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), AIController->PatrolPoints[i]);
 			return EBTNodeResult::Succeeded;
 		}

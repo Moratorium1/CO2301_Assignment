@@ -21,11 +21,8 @@ void AThirdPersonAIController::BeginPlay()
 bool AThirdPersonAIController::HasDied() const
 {
 	AThirdPersonCharacter* ControlledCharcater = Cast<AThirdPersonCharacter>(GetPawn());
-	if (ControlledCharcater != nullptr)
-	{
-		return ControlledCharcater->HasDied();
-	}
-
+	if (ControlledCharcater != nullptr) return ControlledCharcater->HasDied();
+	
 	return true;
 }
 
@@ -65,9 +62,15 @@ bool AThirdPersonAIController::PlayerSeen()
 	APawn* AIPawn = GetPawn();
 	FHitResult HitResult;
 
+	FVector		ViewLocation;
+	FRotator	ViewRotation;
+	GetPlayerViewPoint(ViewLocation, ViewRotation);
+
 	if (LineOfSightTo(PlayerPawn) && IsPlayerInFront())
 	{
-		bool bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, AIPawn->GetActorLocation(), PlayerPawn->GetActorLocation()*1.1, ECollisionChannel::ECC_EngineTraceChannel2);
+		FVector	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;
+
+		bool bObjectHit = GetWorld()->LineTraceSingleByChannel(HitResult, AIPawn->GetActorLocation(), LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2);
 
 		if (!bObjectHit)
 		{

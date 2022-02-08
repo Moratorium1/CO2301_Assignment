@@ -62,7 +62,6 @@ private:
 	void CallStartIronSight();
 	void CallEndIronSight();
 	void CallFireWeapon();
-	void CallSwitchWeaponUp();
-	void CallSwitchWeaponDown();
+	void CallSwitchWeapon();
 
 };

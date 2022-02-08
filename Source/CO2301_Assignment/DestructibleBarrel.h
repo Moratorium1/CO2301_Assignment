@@ -22,10 +22,7 @@ protected:
 
 private:
 
-	UPROPERTY(EditAnywhere)
-	USceneComponent* RootComp;
-
-	UFUNCTION()
+	UFUNCTION()		// Function called when barrel fractures
 	void OnBarrelFracture(const FVector& HitPoint, const FVector& HitDirection);
 
 	UPROPERTY(EditAnywhere)

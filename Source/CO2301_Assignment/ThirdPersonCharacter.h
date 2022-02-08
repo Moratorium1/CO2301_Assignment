@@ -44,8 +44,7 @@ public:
 	void StartIronSight();
 	void EndIronSight();
 	void FireWeapon();
-	void SwitchWeaponUp();
-	void SwitchWeaponDown();
+	void SwitchWeapon();
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

@@ -16,5 +16,4 @@ void UBTDecorator_IfHealthChanged::OnBecomeRelevant(UBehaviorTreeComponent& Owne
 	Super::OnBecomeRelevant(OwnerComp, NodeMemory);
 
 	EBlackboardCompare::Type CompareResult = OwnerComp.GetBlackboardComponent()->CompareKeyValues(UBlackboardKeyType::StaticClass(), BlackboardKey3.GetSelectedKeyID(), BlackboardKey2.GetSelectedKeyID());
-
 }

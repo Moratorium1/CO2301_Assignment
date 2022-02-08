@@ -10,6 +10,13 @@
 
 class UNiagaraSystem;
 
+UENUM()
+enum class EWEAPONMODE : uint8
+{
+	GRENADE,
+	DEFAULT
+};
+
 UCLASS()
 class CO2301_ASSIGNMENT_API AThirdPersonGun : public AActor
 {
@@ -20,8 +27,7 @@ public:
 	AThirdPersonGun();
 
 	void Fire();
-	void SwitchModeUp();
-	void SwitchModeDown();
+	void SwitchMode();
 
 protected:
 	// Called when the game starts or when spawned
@@ -47,9 +53,7 @@ private:
 	AProjectileGrenade* FiredGrenade;
 
 	UPROPERTY()
-	int Mode	= 1;
-	int ModeMax = 1;
-	int ModeMin = 0;
+	EWEAPONMODE Mode = EWEAPONMODE::DEFAULT;
 
 	UPROPERTY()
 	bool bReloading;
@@ -75,10 +79,16 @@ private:
 	int GrenadeAmmo;
 
 	UPROPERTY(EditAnywhere)
+	int MaxGrenadeCount = 1;
+
+	UPROPERTY(EditAnywhere)
 	float Range = 1000;
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Force = 1000.0f;
 
 	UPROPERTY(EditAnywhere)
 	float Recoil = 30.0f;
@@ -92,4 +102,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundBase* GrenadeLaunched;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* WeaponFired;
 };
