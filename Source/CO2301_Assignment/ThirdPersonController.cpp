@@ -36,6 +36,7 @@ void AThirdPersonController::SetupInputComponent()
 	InputComponent->BindAction("Ironsight", IE_Pressed,		this, &AThirdPersonController::CallStartIronSight);
 	InputComponent->BindAction("Ironsight", IE_Released,	this, &AThirdPersonController::CallEndIronSight);
 	InputComponent->BindAction("Fire",		IE_Pressed,		this, &AThirdPersonController::CallFireWeapon);
+	InputComponent->BindAction("Reload",	IE_Pressed,		this, &AThirdPersonController::CallReload);
 
 	InputComponent->BindAction("Switch",	IE_Pressed,		this, &AThirdPersonController::CallSwitchWeapon);
 }
@@ -125,6 +126,14 @@ void AThirdPersonController::CallSwitchWeapon()
 	if (MyPawn->IsA(AThirdPersonCharacter::StaticClass()))
 	{
 		Cast<AThirdPersonCharacter>(MyPawn)->SwitchWeapon();
+	}
+}
+
+void AThirdPersonController::CallReload()
+{
+	if (MyPawn->IsA(AThirdPersonCharacter::StaticClass()))
+	{
+		Cast<AThirdPersonCharacter>(MyPawn)->ReloadWeapon();
 	}
 }
 

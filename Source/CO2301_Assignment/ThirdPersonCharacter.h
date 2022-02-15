@@ -8,6 +8,7 @@
 #include "ThirdPersonCharacter.generated.h"
 
 class AThirdPersonGun;
+class USceneCaptureComponent2D;
 
 UCLASS()
 class CO2301_ASSIGNMENT_API AThirdPersonCharacter : public ACharacter
@@ -18,17 +19,18 @@ public:
 	// Sets default values for this character's properties
 	AThirdPersonCharacter();
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
+	// Variables used by the character animation blueprint
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Animation")
 	bool Ironsight;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Animation")
 	bool bReloading;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Animation")
+	bool bIsDead = false;
 
 	UPROPERTY(VisibleAnywhere)
 	float Health = 100.0f;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Variable")
-	bool bIsDead = false;
 
 	UFUNCTION()
 	bool HasDied();
@@ -45,11 +47,23 @@ public:
 	void EndIronSight();
 	void FireWeapon();
 	void SwitchWeapon();
+	void ReloadWeapon();
+
+	// Active weapon made piblic to allow for pickup interaction
+	UPROPERTY(BlueprintReadOnly)
+	AThirdPersonGun* ActiveWeapon;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	// Used by widget to determine % health to show health bar
 	UFUNCTION(BlueprintPure)
 	float GetHealthPercentage() const;
+
+	UPROPERTY(VisibleAnywhere, Category = "MiniMap")
+	class USpringArmComponent* MiniMapSpringArm;
+
+	UPROPERTY(EditAnywhere, Category = "MiniMap")
+	USceneCaptureComponent2D* MiniMapCam;
 
 protected:
 	// Called when the game starts or when spawned
@@ -68,9 +82,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AThirdPersonGun> WeaponClass;
-
-	UPROPERTY()
-	AThirdPersonGun* ActiveWeapon;
 
 	UPROPERTY(VisibleAnywhere)
 	float HealthMax = 100.0f;

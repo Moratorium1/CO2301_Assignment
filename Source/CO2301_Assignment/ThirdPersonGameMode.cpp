@@ -29,6 +29,7 @@ void AThirdPersonGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Gets all waypoints and filters out spawnpoints into a separate array
 	GetSpawnPoints();
 }
 
@@ -54,7 +55,7 @@ void AThirdPersonGameMode::Tick(float DeltaTime)
 void AThirdPersonGameMode::PawnKilled(APawn* PawnKilled)
 {	//Function called from Character Take Damage if the Character died
 
-	//Check if the PawnKilled is the player character by attempting to cast its controller to the controller 
+	//Check if the PawnKilled is the player character by attempting to cast its controller to the player controller 
 	//If PlayerController != nullptr than the cast succeeded and the PawnKilled was the player EndGame is called with bPlayerIsWinner set to false
 	AThirdPersonController* PlayerController = Cast<AThirdPersonController>(PawnKilled->GetController());
 	if (PlayerController != nullptr)

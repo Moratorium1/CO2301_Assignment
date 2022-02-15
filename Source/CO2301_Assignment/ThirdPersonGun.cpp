@@ -36,21 +36,27 @@ void AThirdPersonGun::BeginPlay()
 
 void AThirdPersonGun::ReloadStart()
 {
-	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
-	OwnerChar->bReloading = true;
-	bReloading = true;
+	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());		// Get a Reference to the character
+	OwnerChar->bReloading = true;													// Set the character reloading bool to true - For animation purposes
+	bReloading = true;																// Set the weapons reloading bool to true	- To prevent firing and mode switching
 	
-	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AThirdPersonGun::ReloadEnd, MaxReloadTime, false);
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &AThirdPersonGun::ReloadEnd, MaxReloadTime, false);	// Set a Timer at the end which ReloadEnd is called
+}
+
+void AThirdPersonGun::Resupply()
+{
+	SingleAmmo = SingleAmmoMax;
+	GrenadeAmmo = GrenadeAmmoMax;
 }
 
 
 void AThirdPersonGun::ReloadEnd()
 {
-	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());
+	AThirdPersonCharacter* OwnerChar = Cast<AThirdPersonCharacter>(GetOwner());		// Get a Reference to the character
 	OwnerChar->bReloading = false;
 	bReloading = false;
 	
-	switch (Mode)
+	switch (Mode)	// Set the Ammo of the mode the player was in to max
 	{
 		case EWEAPONMODE::GRENADE:
 			GrenadeAmmo = GrenadeAmmoMax;
@@ -66,7 +72,6 @@ void AThirdPersonGun::ReloadEnd()
 void AThirdPersonGun::SwitchMode()
 {
 	/* If the character is not reloading swap from the current mode to the other */
-
 	if (!bReloading)
 		switch (Mode)
 		{
@@ -82,26 +87,19 @@ void AThirdPersonGun::SwitchMode()
 
 void AThirdPersonGun::Fire()
 {
-	/*
-		Line trace from player viewport to a location determined by the weapons maximum range
-		if an object is hit store it in a FHitResult and apply damage
-	*/
-
+	// Call a weapon fire function dependent on Mode if the character is not reloading else reload the weapon
 	if (!bReloading)
 	{
-		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true, ENCPoolMethod::AutoRelease, true);
-								 //SpawnSystemAtLocation(const UObject * WorldContextObject, UNiagaraSystem * SystemTemplate, FVector SpawnLocation, FRotator SpawnRotation, FVector Scale, bool bAutoDestroy, bool bAutoActivate, ENCPoolMethod PoolingMethod, bool bPreCullCheck)
-
 		switch (Mode)
 		{
-		case 0:
+		case EWEAPONMODE::GRENADE:
 			if (GrenadeAmmo > 0)
 				FireGrenade();
 			else
 				ReloadStart();
 			break;
 
-		case 1:
+		case EWEAPONMODE::DEFAULT:
 			if (SingleAmmo > 0)
 				SingleFire();
 			else
@@ -115,6 +113,8 @@ void AThirdPersonGun::SingleFire()
 {
 	// Reduce Single Fire Weapon Ammo
 	SingleAmmo--;
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true);
 
 	// Get the pawn to get the controller to then get the viewport
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
@@ -132,11 +132,11 @@ void AThirdPersonGun::SingleFire()
 	Params.AddIgnoredActor(GetOwner());										// Ignore the owner of the gun
 	FVector	LineTraceEnd = ViewLocation + ViewRotation.Vector() * Range;	// Workout where to end the LineTrace
 	
-	FHitResult	HitResult;
-
+	// Play Weapon Fire sound
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponFired, GetActorLocation());
 
 	// Performing a line trace returns a bool & stores infomation about object hit in HitResult
+	FHitResult	HitResult;
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, LineTraceEnd, ECollisionChannel::ECC_EngineTraceChannel2, Params))
 	{
 		//Get the actor from the hit result so that a take damage function can be called
@@ -144,8 +144,15 @@ void AThirdPersonGun::SingleFire()
 		if (ActorHit == nullptr)
 			return;
 
-		UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
+		// Impact Particle System should be spawned to face towards the direction shot from or the reverse of the Rotation the gun that fired
+		FRotator GunRotation = GetActorRotation();
+		FRotator ImpactRotation = FRotator(-GunRotation.Pitch, -GunRotation.Yaw, -GunRotation.Roll);
 
+		// Apply damage and spawn impact particle system
+		UGameplayStatics::ApplyDamage(ActorHit, Damage, OwnerController, this, UDamageType::StaticClass());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ActorHit->GetActorLocation(), ImpactRotation, FVector(ImpactParticleScale), false, true);
+
+		// Apply Force to StaticMesh components
 		UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(HitResult.Component);
 		if (MeshComponent && ActorHit->IsRootComponentMovable())
 		{
@@ -153,6 +160,7 @@ void AThirdPersonGun::SingleFire()
 			MeshComponent->AddImpulse(-Forwards * Force * MeshComponent->GetMass());
 		}
 
+		// Apply Force to DestrucibleMesh components
 		UDestructibleComponent* DestructibleMesh = Cast<UDestructibleComponent>(HitResult.Component);
 		if (DestructibleMesh && ActorHit->IsRootComponentMovable())
 		{
@@ -175,6 +183,7 @@ void AThirdPersonGun::FireGrenade()
 	// Only fire a grenade if there less grenade actors in the world than the maximum grenade count value - default is 1.
 	if (GrenadeCount.Num() < MaxGrenadeCount)	
 	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleFlash, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation(), FVector(1), false, true);
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GrenadeLaunched, GetActorLocation());						// Play Grenade Launched sound
 		FiredGrenade = GetWorld()->SpawnActor<AProjectileGrenade>(ProjectileClass, SpawnLocation, SpawnRotation);	// Spawn the Grenade
 		FiredGrenade->SetOwner(GetOwner());									// Set the Owner of the grenade to the owner of the gun - could use to disable friendly fire

@@ -7,11 +7,9 @@
 #include "ThirdPersonGun.h"
 #include "Components/CapsuleComponent.h"
 #include "ThirdPersonController.h"
-#include "ThirdPersonAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "ThirdPersonGameMode.h"
-
-
+#include "Components/SceneCaptureComponent2D.h"
 
 // Sets default values
 AThirdPersonCharacter::AThirdPersonCharacter()
@@ -35,6 +33,13 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
+	// MiniMap SpringArm
+	MiniMapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MiniMap Spring Arm"));
+	MiniMapSpringArm->SetupAttachment(RootComponent);
+
+	// Create MiniMap Cam
+	MiniMapCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMap"));
+	MiniMapCam->SetupAttachment(MiniMapSpringArm);
 }
 
 // Called when the game starts or when spawned
@@ -42,11 +47,7 @@ void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AThirdPersonAIController* AIController = Cast<AThirdPersonAIController>(GetController());
-
-	if (AIController != nullptr)
-		AIController->BeginPlay();
-
+	// Spawn the wepaon and attach it to the characters hand socket set its owner to this character
 	ActiveWeapon = GetWorld()->SpawnActor<AThirdPersonGun>(WeaponClass);
 	ActiveWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_rSocket"));
 	ActiveWeapon->SetOwner(this);
@@ -60,18 +61,6 @@ void AThirdPersonCharacter::Tick(float DeltaTime)
 
 void AThirdPersonCharacter::MoveForwards(float AxisAmount)
 {
-	// Turn the player to match the controller rotation 
-	// Required since the blueprint is set to not inherit controller yaw
-	//This allows ther player to stand stationary and aim left and right without turning the whole character 
-	AController* CharController = GetController();
-	if (CharController == nullptr)
-		return;
-
-	FRotator CharRotation = GetActorRotation();
-	FRotator ControllerRotation = CharController->GetControlRotation();
-	FRotator NewRotation = FRotator(CharRotation.Pitch, ControllerRotation.Yaw, CharRotation.Roll);
-
-	SetActorRotation(NewRotation);
 	AddMovementInput(GetActorForwardVector(), AxisAmount);
 }
 
@@ -93,7 +82,6 @@ void AThirdPersonCharacter::Turn(float AxisAmount)
 void AThirdPersonCharacter::Jump()
 {
 	Super::Jump();
-
 }
 
 void AThirdPersonCharacter::StartCrouch()
@@ -126,9 +114,15 @@ void AThirdPersonCharacter::FireWeapon()
 void AThirdPersonCharacter::SwitchWeapon()
 {
 	/* If the character is not reloading call the switch mode function of the weapon */
-
 	if (!bReloading)
 		ActiveWeapon->SwitchMode();
+}
+
+void AThirdPersonCharacter::ReloadWeapon()
+{
+	/* If the character is not reloading call the switch mode function of the weapon */
+	if (!bReloading)
+		ActiveWeapon->ReloadStart();
 }
 
 bool AThirdPersonCharacter::HasDied()

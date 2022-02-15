@@ -63,5 +63,6 @@ private:
 	void CallEndIronSight();
 	void CallFireWeapon();
 	void CallSwitchWeapon();
+	void CallReload();
 
 };

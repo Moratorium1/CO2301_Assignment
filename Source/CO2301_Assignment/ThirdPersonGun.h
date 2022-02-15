@@ -26,8 +26,13 @@ public:
 	// Sets default values for this actor's properties
 	AThirdPersonGun();
 
+	// Public Functions called via the character
 	void Fire();
 	void SwitchMode();
+	void ReloadStart();
+
+	// Called by AmmoPickup to refill all ammo
+	void Resupply();
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,9 +40,9 @@ protected:
 
 private:
 
+	// private functions called form within public functions
 	void FireGrenade();
 	void SingleFire();
-	void ReloadStart();
 	void ReloadEnd();
 
 	UPROPERTY(VisibleAnywhere)
@@ -90,14 +95,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Force = 1000.0f;
 
-	UPROPERTY(EditAnywhere)
-	float Recoil = 30.0f;
-
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AProjectileGrenade> ProjectileClass;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* MuzzleFlash;
+
+	UPROPERTY(EditAnywhere)
+	float ImpactParticleScale = 0.3f;
 
 	UPROPERTY(EditAnywhere)
 	USoundBase* GrenadeLaunched;
